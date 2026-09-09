@@ -1,0 +1,17 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Vector store data (regenerated from source docs, not source itself)
+chroma_db/
+*.sqlite3
+
+# OS/editor noise
+.vscode/
+.DS_Store
+
+# Uploaded documents (may contain sensitive project data — don't commit real data)
+data/raw/*
+!data/raw/.gitkeep
