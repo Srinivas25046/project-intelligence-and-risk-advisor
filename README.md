@@ -7,6 +7,7 @@ An AI-driven platform that ingests enterprise project documents — proposals, r
 - **Multi-format document ingestion** — parses PDF, DOCX, CSV, and TXT project documents into a unified text representation
 - **Semantic search over project knowledge** — documents are chunked, embedded, and indexed in a vector database, enabling retrieval by meaning rather than exact keyword match
 - **Local, cost-free embeddings** — runs entirely on CPU with no external API dependency for the retrieval layer
+- **Hybrid retrieval** — combines semantic similarity search with exact metadata filtering (e.g. filtering by task status, owner, or file type) for precise structured queries
 
 **Planned:**
 - [ ] Risk-detection agent (flags schedule, scope, and resourcing risks from ingested content)

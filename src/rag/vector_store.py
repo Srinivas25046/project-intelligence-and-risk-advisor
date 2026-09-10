@@ -51,12 +51,12 @@ def index_chunks(chunks: list[Chunk]):
     print(f"Indexed {len(chunks)} chunks into vector store.")
 
 
-def search(query: str, top_k: int = 5):
+def search(query: str, top_k: int = 5, where: dict | None = None):
     collection = get_collection()
     query_embedding = embed_texts([query])[0]
 
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=top_k,
-    )
-    return results
+    query_kwargs = {"query_embeddings": [query_embedding], "n_results": top_k}
+    if where:
+        query_kwargs["where"] = where
+
+    return collection.query(**query_kwargs)
