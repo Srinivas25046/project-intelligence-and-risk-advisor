@@ -12,6 +12,6 @@ chroma_db/
 .vscode/
 .DS_Store
 
-# Uploaded documents (may contain sensitive project data — don't commit real data)
+# Uploaded documents (may contain sensitive project data)
 data/raw/*
 !data/raw/.gitkeep
