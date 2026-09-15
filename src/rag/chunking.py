@@ -1,4 +1,3 @@
-# src/rag/chunking.py
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.schemas import Document, Chunk
 
