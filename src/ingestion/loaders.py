@@ -1,5 +1,6 @@
+# src/ingestion/loaders.py
 import os
-import uuid
+import hashlib
 from pypdf import PdfReader
 from docx import Document as DocxDocument
 import pandas as pd
@@ -7,12 +8,18 @@ import pandas as pd
 from src.schemas import Document
 
 
+def _make_doc_id(filepath: str) -> str:
+    with open(filepath, "rb") as f:
+        content_hash = hashlib.md5(f.read()).hexdigest()[:12]
+    return f"{os.path.basename(filepath)}_{content_hash}"
+
+
 def load_pdf(filepath: str) -> Document:
     reader = PdfReader(filepath)
     # PDFs store text per page internally, so we extract and join per-page text.
     full_text = "\n".join(page.extract_text() or "" for page in reader.pages)
     return Document(
-        doc_id=str(uuid.uuid4()),
+        doc_id=_make_doc_id(filepath),
         filename=os.path.basename(filepath),
         file_type="pdf",
         raw_text=full_text,
@@ -25,7 +32,7 @@ def load_docx(filepath: str) -> Document:
     # DOCX stores content as a sequence of paragraph objects — join their text.
     full_text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
     return Document(
-        doc_id=str(uuid.uuid4()),
+        doc_id=_make_doc_id(filepath),
         filename=os.path.basename(filepath),
         file_type="docx",
         raw_text=full_text,
@@ -38,7 +45,7 @@ def load_csv(filepath: str) -> Document:
     lines = [", ".join(f"{col}: {row[col]}" for col in df.columns) for _, row in df.iterrows()]
     full_text = "\n".join(lines)
     return Document(
-        doc_id=str(uuid.uuid4()),
+        doc_id=_make_doc_id(filepath),
         filename=os.path.basename(filepath),
         file_type="csv",
         raw_text=full_text,
@@ -50,7 +57,7 @@ def load_txt(filepath: str) -> Document:
     with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
         full_text = f.read()
     return Document(
-        doc_id=str(uuid.uuid4()),
+        doc_id=_make_doc_id(filepath),
         filename=os.path.basename(filepath),
         file_type="txt",
         raw_text=full_text,
