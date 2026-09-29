@@ -1,0 +1,66 @@
+{
+  "blockers": [
+    {
+      "description": "Payment gateway vendor has not provided updated API credentials",
+      "blocking": "backend integration work",
+      "source": "status_report.pdf"
+    },
+    {
+      "description": "T-104: Write regression test suite for onboarding flow",
+      "blocking": "onboarding flow testing",
+      "source": "small_task_list.csv"
+    },
+    {
+      "description": "T-101: Integrate third-party payment gateway",
+      "blocking": "payment gateway integration",
+      "source": "small_task_list.csv"
+    }
+  ],
+  "action_items": [
+    {
+      "task": "Draft stakeholder communication on release delay",
+      "owner": "Priya",
+      "status": "Not Started"
+    },
+    {
+      "task": "Review accessibility compliance of UI library",
+      "owner": "Neha",
+      "status": "In Progress"
+    },
+    {
+      "task": "Write regression test suite for onboarding flow",
+      "owner": "Karan",
+      "status": "Blocked"
+    },
+    {
+      "task": "Integrate third-party payment gateway",
+      "owner": "Arjun",
+      "status": "Blocked"
+    },
+    {
+      "task": "Update risk register with vendor delay",
+      "owner": "Priya",
+      "status": "Done"
+    },
+    {
+      "task": "Escalate payment gateway credential delay to vendor account manager",
+      "owner": "Arjun",
+      "status": "Not specified"
+    },
+    {
+      "task": "Evaluate alternative UI libraries for accessibility compliance",
+      "owner": "Neha",
+      "status": "Not specified"
+    },
+    {
+      "task": "File an infrastructure ticket for staging environment instability",
+      "owner": "Karan",
+      "status": "Not specified"
+    },
+    {
+      "task": "Update the risk register and inform stakeholders of possible delay",
+      "owner": "Priya",
+      "status": "Not specified"
+    }
+  ]
+}

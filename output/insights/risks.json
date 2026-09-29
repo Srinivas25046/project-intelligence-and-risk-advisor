@@ -1,0 +1,35 @@
+{
+  "risks": [
+    {
+      "description": "Delay in receiving production API credentials from the payment vendor, blocking backend integration.",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "status_report.pdf"
+    },
+    {
+      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid-development replacement.",
+      "likely_impact": "scope|quality",
+      "severity": "medium",
+      "evidence_source": "project_proposal.docx"
+    },
+    {
+      "description": "Staging environment instability blocking QA regression testing for multiple consecutive days.",
+      "likely_impact": "schedule|quality",
+      "severity": "high",
+      "evidence_source": "status_report.pdf"
+    },
+    {
+      "description": "If the vendor credential delay is not resolved within five business days, the end-of-month release date is at risk of slipping by approximately one to two weeks.",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "status_report.pdf"
+    },
+    {
+      "description": "Need to prepare stakeholder communication in case the release date shifts, which could affect stakeholder confidence and project perception.",
+      "likely_impact": "schedule|quality",
+      "severity": "medium",
+      "evidence_source": "notes.txt"
+    }
+  ],
+  "delivery_forecast": "The project is currently at\u2011risk. Backend integration is stalled due to vendor credential delays, and staging instability is blocking QA. These blockers threaten the 8\u2011week delivery window, potentially pushing the release by one to two weeks if the vendor issue is not resolved promptly."
+}
