@@ -1,4 +1,3 @@
-# src/ingestion/loaders.py
 import os
 import hashlib
 from pypdf import PdfReader
@@ -16,7 +15,6 @@ def _make_doc_id(filepath: str) -> str:
 
 def load_pdf(filepath: str) -> Document:
     reader = PdfReader(filepath)
-    # PDFs store text per page internally, so we extract and join per-page text.
     full_text = "\n".join(page.extract_text() or "" for page in reader.pages)
     return Document(
         doc_id=_make_doc_id(filepath),
@@ -29,7 +27,6 @@ def load_pdf(filepath: str) -> Document:
 
 def load_docx(filepath: str) -> Document:
     doc = DocxDocument(filepath)
-    # DOCX stores content as a sequence of paragraph objects — join their text.
     full_text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
     return Document(
         doc_id=_make_doc_id(filepath),
@@ -42,14 +39,14 @@ def load_docx(filepath: str) -> Document:
 
 def load_csv(filepath: str) -> Document:
     df = pd.read_csv(filepath)
-    lines = [", ".join(f"{col}: {row[col]}" for col in df.columns) for _, row in df.iterrows()]
+    lines = [" | ".join(f"{col}: {row[col]}" for col in df.columns) for _, row in df.iterrows()]
     full_text = "\n".join(lines)
     return Document(
         doc_id=_make_doc_id(filepath),
         filename=os.path.basename(filepath),
         file_type="csv",
         raw_text=full_text,
-        metadata={"num_rows": len(df), "columns": ", ".join(df.columns)},  # ← joined into a string
+        metadata={"num_rows": len(df), "columns": ", ".join(df.columns)},
     )
 
 
@@ -65,8 +62,6 @@ def load_txt(filepath: str) -> Document:
     )
 
 
-# Dispatch table: maps file extension -> the right loader function.
-# This "strategy pattern" avoids a long if/elif chain and makes adding a new format a one-line change.
 LOADERS = {
     ".pdf": load_pdf,
     ".docx": load_docx,

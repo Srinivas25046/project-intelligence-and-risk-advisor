@@ -16,13 +16,16 @@ def run_ingestion_pipeline():
         if not os.path.isfile(filepath):
             continue
 
-        print(f"Loading: {filename}")
-        document = load_document(filepath)
+        try:
+            print(f"Loading: {filename}")
+            document = load_document(filepath)
+        except ValueError as e:
+            print(f"Skipping {filename}: {e}")
+            continue
 
         print(f"Chunking: {filename}")
         chunks = chunk_document(document)
         print(f" -> {len(chunks)} chunks created")
-
         all_chunks.extend(chunks)
 
     print(f"\nTotal chunks across all documents: {len(all_chunks)}")

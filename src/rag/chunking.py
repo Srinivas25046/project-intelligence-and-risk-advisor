@@ -7,15 +7,12 @@ def chunk_document(
     chunk_size: int = 500,
     chunk_overlap: int = 50,
 ) -> list[Chunk]:
-    # CSVs are structured, row-based data. Splitting by character count can merge multiple unrelated rows into one chunk, diluting the
-    # embedding and hurting retrieval precision. Instead, each row (already a single line, from load_csv's row-per-line format)
-    # becomes its own chunk — this preserves one fact per vector.
     if document.file_type == "csv":
         lines = [line for line in document.raw_text.split("\n") if line.strip()]
         chunks = []
         for i, line in enumerate(lines):
             row_fields = {}
-            for pair in line.split(", "):
+            for pair in line.split(" | "):
                 if ": " in pair:
                     key, value = pair.split(": ", 1)
                     row_fields[key.strip()] = value.strip()
@@ -30,13 +27,12 @@ def chunk_document(
                         "filename": document.filename,
                         "file_type": document.file_type,
                         **document.metadata,
-                        **row_fields,   # adds status, owner, priority, task_id as real metadata
+                        **row_fields,
                     },
                 )
             )
         return chunks
 
-    # Prose documents (PDF, DOCX, TXT) still benefit from the recursive character splitter, since meaning spans sentences/paragraphs.
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
