@@ -25,7 +25,7 @@ if __name__ == "__main__":
         try:
             result = agent.run()
             print(json.dumps(result, indent=2))
-            save_insight(name, result)
+            save_insight(name, result)  # persist for downstream modules
         except Exception as e:
             print(f"[{agent.agent_name}] All providers failed: {e}")
             print("(Continuing to next agent rather than stopping the whole run.)")

@@ -1,0 +1,9 @@
+{
+  "overall_health_score": 67,
+  "breakdown": {
+    "scope_clarity": 100,
+    "timeline_risk": 54,
+    "blocker_load": 64
+  },
+  "rationale": "Scope clarity is 100/100 based on how completely scope fields were extracted. Timeline risk is 54/100, reduced by 4 identified risk(s). Blocker load is 64/100, reduced by 3 active blocker(s)."
+}

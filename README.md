@@ -15,6 +15,9 @@ Built as part of an Infosys Springboard internship project on AI-driven enterpri
   - **Blocker agent** — extracts active blockers and action items, cross-referencing task status so nothing blocked slips through
 - **Resilient, multi-provider LLM backend** — each agent calls out to Google Gemini, Groq, and Cloudflare Workers AI in a rotating fallback chain, so a single provider's rate limit, outage, or deprecated model doesn't take down the pipeline
 - **Local, cost-free embeddings** — runs entirely on CPU with no external API dependency for the retrieval layer
+- **Documentation generation** — produces Agile user stories, a formal risk register with mitigation suggestions, and a consolidated action item list, chained from earlier agents' structured output
+- **Deterministic health scoring** — auditable, formula-based project health score (scope clarity, timeline risk, blocker load) rather than an LLM-generated number
+- **Conversational assistant** — hybrid-grounded Q&A combining a persisted project summary with live document retrieval for specific detail questions
 
 **Planned:**
 - [ ] Project health scoring dashboard

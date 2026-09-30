@@ -1,6 +1,6 @@
 {
   "project_goals": [
-    "Reduce manual onboarding time from five business days to under one business day."
+    "Reduce manual onboarding time from five business days to under one business day"
   ],
   "deliverables": [
     "Payment gateway integration",
@@ -23,18 +23,6 @@
     }
   ],
   "responsibilities": [
-    {
-      "owner": "Priya",
-      "responsibility": "Draft stakeholder communication on release delay"
-    },
-    {
-      "owner": "Priya",
-      "responsibility": "Update risk register with vendor delay"
-    },
-    {
-      "owner": "Priya",
-      "responsibility": "Update risk register and inform stakeholders of possible delay"
-    },
     {
       "owner": "Arjun",
       "responsibility": "Integrate third-party payment gateway"
@@ -70,6 +58,14 @@
     {
       "owner": "Karan",
       "responsibility": "File an infrastructure ticket for staging environment instability"
+    },
+    {
+      "owner": "Priya",
+      "responsibility": "Update risk register with vendor delay"
+    },
+    {
+      "owner": "Priya",
+      "responsibility": "Draft stakeholder communication on release delay"
     }
   ]
 }
