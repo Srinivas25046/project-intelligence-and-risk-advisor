@@ -1,29 +1,23 @@
 {
   "risks": [
     {
-      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration.",
+      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and making it the critical path item for release",
       "likely_impact": "schedule",
       "severity": "high",
-      "evidence_source": "status_report.pdf; project_proposal.docx"
+      "evidence_source": "status_report.pdf"
     },
     {
-      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement.",
-      "likely_impact": "scope",
+      "description": "Staging environment instability blocking QA regression testing for three consecutive days",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "status_report.pdf"
+    },
+    {
+      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement",
+      "likely_impact": "scope|quality",
       "severity": "medium",
       "evidence_source": "project_proposal.docx"
-    },
-    {
-      "description": "Staging environment instability blocking QA regression testing for three consecutive days.",
-      "likely_impact": "schedule",
-      "severity": "medium",
-      "evidence_source": "status_report.pdf"
-    },
-    {
-      "description": "Potential release date slip of one to two weeks if vendor credential delay is not resolved within five business days.",
-      "likely_impact": "schedule",
-      "severity": "high",
-      "evidence_source": "status_report.pdf"
     }
   ],
-  "delivery_forecast": "The project is currently at\u2011risk. Frontend development remains on schedule, but backend integration is stalled due to a two\u2011week delay in payment vendor credentials, and staging instability has blocked QA for three days. These blockers threaten the end\u2011of\u2011month release, potentially pushing it back by one to two weeks. Escalation efforts are underway, but the critical path remains uncertain, so the project is not on track."
+  "delivery_forecast": "The project is currently at\u2011risk. Frontend development remains on schedule, but backend integration is stalled due to a two\u2011week delay in vendor API credentials, and staging instability has blocked QA testing. These blockers threaten the planned 8\u2011week delivery window, with a potential one\u2011to\u2011two\u2011week slip if the vendor issue is not resolved within five business days."
 }

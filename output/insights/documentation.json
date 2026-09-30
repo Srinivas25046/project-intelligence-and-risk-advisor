@@ -1,71 +1,57 @@
 {
   "user_stories": [
     {
-      "role": "Backend Engineer",
-      "goal": "integrate third\u2011party payment gateway",
-      "benefit": "process payments seamlessly"
+      "role": "Client",
+      "goal": "a streamlined onboarding module",
+      "benefit": "I can complete registration in under one business day"
     },
     {
-      "role": "UI Developer",
-      "goal": "build client onboarding dashboard UI",
-      "benefit": "new clients can view and complete onboarding steps quickly"
+      "role": "Client",
+      "goal": "secure payment gateway integration",
+      "benefit": "I can make payments quickly and safely"
     },
     {
-      "role": "Compliance Engineer",
-      "goal": "implement automated KYC document verification",
-      "benefit": "reduce manual review time and speed onboarding"
+      "role": "Client",
+      "goal": "an intuitive onboarding dashboard UI",
+      "benefit": "I can track my progress easily"
     },
     {
-      "role": "UI Developer",
-      "goal": "ensure basic accessibility compliance (WCAG 2.1 AA)",
-      "benefit": "application is usable by people with disabilities"
+      "role": "Client",
+      "goal": "automated KYC document verification",
+      "benefit": "my identity is verified without manual intervention"
+    },
+    {
+      "role": "Client",
+      "goal": "basic accessibility compliance (WCAG 2.1 AA)",
+      "benefit": "I can use the platform regardless of accessibility needs"
     }
   ],
   "risk_register": [
     {
       "risk_id": "R-1",
-      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration.",
+      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and making it the critical path item for release",
       "severity": "high",
       "impact": "schedule",
-      "mitigation_suggestion": "Escalate vendor credential delay to vendor account manager and request expedited delivery; consider alternative payment gateway if delay persists."
+      "mitigation_suggestion": "Escalate to vendor account manager, request expedited credentials, and establish a fallback integration path"
     },
     {
       "risk_id": "R-2",
-      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement.",
-      "severity": "medium",
-      "impact": "scope",
-      "mitigation_suggestion": "Review accessibility compliance of UI library; evaluate alternative UI libraries; plan for potential replacement early."
+      "description": "Staging environment instability blocking QA regression testing for three consecutive days",
+      "severity": "high",
+      "impact": "schedule",
+      "mitigation_suggestion": "File an infrastructure ticket, set up monitoring, and coordinate with ops to stabilize the environment"
     },
     {
       "risk_id": "R-3",
-      "description": "Staging environment instability blocking QA regression testing for three consecutive days.",
+      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement",
       "severity": "medium",
-      "impact": "schedule",
-      "mitigation_suggestion": "File infrastructure ticket for staging instability; set up monitoring; coordinate with ops to resolve quickly."
-    },
-    {
-      "risk_id": "R-4",
-      "description": "Potential release date slip of one to two weeks if vendor credential delay is not resolved within five business days.",
-      "severity": "high",
-      "impact": "schedule",
-      "mitigation_suggestion": "Escalate vendor delay; track progress; adjust release plan; communicate delay to stakeholders."
+      "impact": "scope|quality",
+      "mitigation_suggestion": "Evaluate alternative UI libraries, conduct an accessibility audit, and plan for replacement if necessary"
     }
   ],
   "action_item_list": [
     {
       "item": "Payment gateway vendor has not provided updated API credentials",
-      "owner": "Arjun",
-      "status": "Blocked",
-      "source": "blocker"
-    },
-    {
-      "item": "Write regression test suite for onboarding flow",
-      "owner": "Karan",
-      "status": "Blocked",
-      "source": "blocker"
-    },
-    {
-      "item": "Integrate third\u2011party payment gateway",
       "owner": "Arjun",
       "status": "Blocked",
       "source": "blocker"
@@ -80,6 +66,18 @@
       "item": "Review accessibility compliance of UI library",
       "owner": "Neha",
       "status": "In Progress",
+      "source": "action_item"
+    },
+    {
+      "item": "Write regression test suite for onboarding flow",
+      "owner": "Karan",
+      "status": "Blocked",
+      "source": "action_item"
+    },
+    {
+      "item": "Integrate third-party payment gateway",
+      "owner": "Arjun",
+      "status": "Blocked",
       "source": "action_item"
     },
     {

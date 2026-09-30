@@ -18,6 +18,7 @@ Built as part of an Infosys Springboard internship project on AI-driven enterpri
 - **Documentation generation** — produces Agile user stories, a formal risk register with mitigation suggestions, and a consolidated action item list, chained from earlier agents' structured output
 - **Deterministic health scoring** — auditable, formula-based project health score (scope clarity, timeline risk, blocker load) rather than an LLM-generated number
 - **Conversational assistant** — hybrid-grounded Q&A combining a persisted project summary with live document retrieval for specific detail questions
+- **Streamlit dashboard** — a live UI wrapping the full pipeline: ingestion, extraction agents, documentation generation, health scoring, and the conversational assistant, each triggered step-by-step for demo purposes
 
 **Planned:**
 - [ ] Project health scoring dashboard
@@ -34,6 +35,7 @@ Built as part of an Infosys Springboard internship project on AI-driven enterpri
 | Embeddings | Sentence-Transformers (`all-MiniLM-L6-v2`) |
 | Vector store | ChromaDB |
 | LLM reasoning | Google Gemini, Groq, Cloudflare Workers AI (via OpenAI-compatible client) |
+| UI | Streamlit |
 
 ## Architecture
 
@@ -116,6 +118,14 @@ python -m src.run_agents
 ```
 
 This retrieves relevant context for each agent, sends it to an LLM for reasoning, and prints structured JSON output for scope, risks, and blockers/action items.
+
+**3. Launch the interactive dashboard:**
+
+```bash
+streamlit run app.py
+```
+
+Opens a browser UI where each pipeline stage (ingestion, agents, documentation, health score) runs on demand via sidebar buttons, with a chat tab for querying the project interactively.
 
 ## License
 

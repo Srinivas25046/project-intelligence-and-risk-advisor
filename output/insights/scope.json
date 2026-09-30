@@ -3,6 +3,7 @@
     "Reduce manual onboarding time from five business days to under one business day"
   ],
   "deliverables": [
+    "Client onboarding module",
     "Payment gateway integration",
     "Onboarding dashboard UI",
     "Automated KYC document verification",
@@ -29,11 +30,11 @@
     },
     {
       "owner": "Arjun",
-      "responsibility": "Conduct load testing on payment flow"
+      "responsibility": "Escalate payment gateway credential delay to vendor account manager"
     },
     {
       "owner": "Arjun",
-      "responsibility": "Escalate payment gateway credential delay to vendor account manager"
+      "responsibility": "Conduct load testing on payment flow"
     },
     {
       "owner": "Neha",
@@ -41,11 +42,11 @@
     },
     {
       "owner": "Neha",
-      "responsibility": "Review accessibility compliance of UI library"
+      "responsibility": "Evaluate alternative UI libraries for accessibility compliance"
     },
     {
-      "owner": "Neha",
-      "responsibility": "Evaluate alternative UI libraries for accessibility compliance"
+      "owner": "Karan",
+      "responsibility": "File an infrastructure ticket for staging environment instability"
     },
     {
       "owner": "Karan",
@@ -56,12 +57,8 @@
       "responsibility": "Write regression test suite for onboarding flow"
     },
     {
-      "owner": "Karan",
-      "responsibility": "File an infrastructure ticket for staging environment instability"
-    },
-    {
       "owner": "Priya",
-      "responsibility": "Update risk register with vendor delay"
+      "responsibility": "Update risk register with vendor delay and inform stakeholders"
     },
     {
       "owner": "Priya",
