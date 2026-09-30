@@ -64,7 +64,14 @@ Answer conversationally, in plain text (not JSON). Be concise and specific."""
 
     def ask(self, question: str) -> str:
         prompt = self._build_prompt(question)
-        answer = self.llm.generate(prompt)
+        try:
+            answer = self.llm.generate(prompt)
+        except Exception as e:
+            answer = (
+                "I couldn't reach any AI provider just now (all 3 are currently "
+                "unavailable or rate-limited). Please try asking again in a moment."
+            )
+            print(f"[ChatAssistant] All providers failed: {e}")
         self.history.append(("User", question))
         self.history.append(("Assistant", answer))
         return answer

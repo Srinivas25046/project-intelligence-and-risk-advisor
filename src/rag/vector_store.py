@@ -5,12 +5,14 @@ from src.rag.embeddings import embed_texts
 PERSIST_DIR = "chroma_db"
 COLLECTION_NAME = "project_knowledge_base"
 
+
+def get_collection():
+    client = chromadb.PersistentClient(path=PERSIST_DIR)
+    collection = client.get_or_create_collection(name=COLLECTION_NAME)
+    return collection
+
+
 def _sanitize_metadata(metadata: dict) -> dict:
-    """
-    ChromaDB metadata values must be str, int, float, or bool.
-    Anything else (lists, dicts, None) is converted to a string so
-    indexing never fails on an unexpected metadata shape.
-    """
     clean = {}
     for k, v in metadata.items():
         if isinstance(v, (str, int, float, bool)):
@@ -20,17 +22,19 @@ def _sanitize_metadata(metadata: dict) -> dict:
     return clean
 
 
-def get_collection():
-    client = chromadb.PersistentClient(path=PERSIST_DIR)
-    # get_or_create avoids errors when re-running during development
-    collection = client.get_or_create_collection(name=COLLECTION_NAME)
-    return collection
+def delete_by_filename(filename: str):
+    collection = get_collection()
+    try:
+        collection.delete(where={"filename": filename})
+    except Exception:
+        pass
 
 
 def index_chunks(chunks: list[Chunk]):
-    """
-    Embeds and stores a list of Chunks into the vector database.
-    """
+    if not chunks:
+        print("No chunks to index.")
+        return
+
     collection = get_collection()
 
     texts = [c.text for c in chunks]

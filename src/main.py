@@ -3,7 +3,7 @@ os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
 from src.ingestion.loaders import load_document
 from src.rag.chunking import chunk_document
-from src.rag.vector_store import index_chunks, search
+from src.rag.vector_store import index_chunks, search, delete_by_filename
 
 RAW_DATA_DIR = "data/raw"
 
@@ -26,6 +26,8 @@ def run_ingestion_pipeline():
         print(f"Chunking: {filename}")
         chunks = chunk_document(document)
         print(f" -> {len(chunks)} chunks created")
+
+        delete_by_filename(filename)
         all_chunks.extend(chunks)
 
     print(f"\nTotal chunks across all documents: {len(all_chunks)}")
