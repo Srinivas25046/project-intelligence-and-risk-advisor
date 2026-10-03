@@ -4,6 +4,7 @@ from src.agents.base_agent import BaseAgent
 class BlockerActionItemAgent(BaseAgent):
     agent_name = "blocker_agent"
     retrieval_query = "blockers pending decisions unresolved issues action items meeting notes"
+    additional_queries = ["newly reported issues or defects from the latest progress update"]
     additional_filters = [{"status": "Blocked"}]
     system_instructions = """You are a project coordinator. Extract blockers and action items from the provided project content.
 

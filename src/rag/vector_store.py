@@ -64,3 +64,8 @@ def search(query: str, top_k: int = 5, where: dict | None = None):
         query_kwargs["where"] = where
 
     return collection.query(**query_kwargs)
+
+def get_chunks_by_filename(filename: str):
+    collection = get_collection()
+    result = collection.get(where={"filename": filename})
+    return result.get("documents", []), result.get("metadatas", [])

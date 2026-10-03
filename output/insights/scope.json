@@ -42,11 +42,7 @@
     },
     {
       "owner": "Neha",
-      "responsibility": "Evaluate alternative UI libraries for accessibility compliance"
-    },
-    {
-      "owner": "Karan",
-      "responsibility": "File an infrastructure ticket for staging environment instability"
+      "responsibility": "Evaluate alternative UI libraries and review accessibility compliance"
     },
     {
       "owner": "Karan",
@@ -57,8 +53,16 @@
       "responsibility": "Write regression test suite for onboarding flow"
     },
     {
+      "owner": "Karan",
+      "responsibility": "File an infrastructure ticket for staging environment instability"
+    },
+    {
+      "owner": "Karan",
+      "responsibility": "Investigate the KYC image compression issue"
+    },
+    {
       "owner": "Priya",
-      "responsibility": "Update risk register with vendor delay and inform stakeholders"
+      "responsibility": "Update the risk register"
     },
     {
       "owner": "Priya",

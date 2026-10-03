@@ -1,23 +1,41 @@
 {
   "risks": [
     {
-      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and making it the critical path item for release",
+      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and threatening the release date.",
       "likely_impact": "schedule",
       "severity": "high",
-      "evidence_source": "status_report.pdf"
+      "evidence_source": "status_report.pdf; notes.txt; progress_update_sep20.txt"
     },
     {
-      "description": "Staging environment instability blocking QA regression testing for three consecutive days",
-      "likely_impact": "schedule",
-      "severity": "high",
-      "evidence_source": "status_report.pdf"
-    },
-    {
-      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement",
+      "description": "Chosen UI component library may not satisfy WCAG 2.1 AA accessibility requirements, potentially requiring rework of the onboarding dashboard.",
       "likely_impact": "scope|quality",
       "severity": "medium",
-      "evidence_source": "project_proposal.docx"
+      "evidence_source": "project_proposal.docx; notes.txt"
+    },
+    {
+      "description": "Staging environment instability blocked QA regression testing for multiple days, delaying verification of new features.",
+      "likely_impact": "schedule|quality",
+      "severity": "medium",
+      "evidence_source": "status_report.pdf; progress_update_sep20.txt"
+    },
+    {
+      "description": "Automated KYC document verification rejects valid government ID uploads due to image compression, blocking end\u2011to\u2011end onboarding.",
+      "likely_impact": "scope|quality",
+      "severity": "high",
+      "evidence_source": "progress_update_sep20.txt"
+    },
+    {
+      "description": "Load testing on the payment flow has not yet been conducted, leaving performance risks unvalidated.",
+      "likely_impact": "quality|cost",
+      "severity": "medium",
+      "evidence_source": "small_task_list.csv"
+    },
+    {
+      "description": "Backend integration remains behind schedule, increasing the risk of missing the end\u2011of\u2011month release.",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "notes.txt; status_report.pdf"
     }
   ],
-  "delivery_forecast": "The project is currently at\u2011risk. Frontend development remains on schedule, but backend integration is stalled due to a two\u2011week delay in vendor API credentials, and staging instability has blocked QA testing. These blockers threaten the planned 8\u2011week delivery window, with a potential one\u2011to\u2011two\u2011week slip if the vendor issue is not resolved within five business days."
+  "delivery_forecast": "The project is currently at risk of missing the end\u2011of\u2011month release. While the payment gateway credentials have been received and backend work is expected to finish soon, a critical KYC verification defect and earlier staging instability have delayed testing. These issues, combined with the remaining UI accessibility review, mean the project is not on track to meet the original 8\u2011week window."
 }

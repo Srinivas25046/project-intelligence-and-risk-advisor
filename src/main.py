@@ -19,7 +19,7 @@ def run_ingestion_pipeline():
         try:
             print(f"Loading: {filename}")
             document = load_document(filepath)
-        except ValueError as e:
+        except Exception as e:
             print(f"Skipping {filename}: {e}")
             continue
 

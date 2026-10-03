@@ -1,58 +1,97 @@
 {
   "user_stories": [
     {
-      "role": "Client",
-      "goal": "a streamlined onboarding module",
-      "benefit": "I can complete registration in under one business day"
+      "role": "Stakeholder",
+      "goal": "implement a client onboarding module",
+      "benefit": "to reduce manual onboarding time from five business days to under one business day"
     },
     {
-      "role": "Client",
-      "goal": "secure payment gateway integration",
-      "benefit": "I can make payments quickly and safely"
+      "role": "Stakeholder",
+      "goal": "integrate a third\u2011party payment gateway",
+      "benefit": "to enable seamless payment processing for new clients"
     },
     {
-      "role": "Client",
-      "goal": "an intuitive onboarding dashboard UI",
-      "benefit": "I can track my progress easily"
+      "role": "Stakeholder",
+      "goal": "build an onboarding dashboard UI",
+      "benefit": "to provide users with a clear, real\u2011time view of their onboarding progress"
     },
     {
-      "role": "Client",
-      "goal": "automated KYC document verification",
-      "benefit": "my identity is verified without manual intervention"
+      "role": "Stakeholder",
+      "goal": "automate KYC document verification",
+      "benefit": "to eliminate manual review and speed up onboarding"
     },
     {
-      "role": "Client",
-      "goal": "basic accessibility compliance (WCAG 2.1 AA)",
-      "benefit": "I can use the platform regardless of accessibility needs"
+      "role": "Stakeholder",
+      "goal": "ensure basic accessibility compliance (WCAG 2.1 AA)",
+      "benefit": "to make the onboarding experience usable for all users, including those with disabilities"
     }
   ],
   "risk_register": [
     {
       "risk_id": "R-1",
-      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and making it the critical path item for release",
+      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and threatening the release date.",
       "severity": "high",
       "impact": "schedule",
-      "mitigation_suggestion": "Escalate to vendor account manager, request expedited credentials, and establish a fallback integration path"
+      "mitigation_suggestion": "Escalate vendor delay to account manager, request expedited credentials, and prepare a contingency plan for alternative credentials."
     },
     {
       "risk_id": "R-2",
-      "description": "Staging environment instability blocking QA regression testing for three consecutive days",
-      "severity": "high",
-      "impact": "schedule",
-      "mitigation_suggestion": "File an infrastructure ticket, set up monitoring, and coordinate with ops to stabilize the environment"
+      "description": "Chosen UI component library may not satisfy WCAG 2.1 AA accessibility requirements, potentially requiring rework of the onboarding dashboard.",
+      "severity": "medium",
+      "impact": "scope|quality",
+      "mitigation_suggestion": "Conduct an early accessibility audit of the library; if non\u2011compliant, select an alternative library or implement custom components."
     },
     {
       "risk_id": "R-3",
-      "description": "Chosen UI component library may not fully meet accessibility requirements, potentially requiring a mid\u2011project replacement",
+      "description": "Staging environment instability blocked QA regression testing for multiple days, delaying verification of new features.",
       "severity": "medium",
+      "impact": "schedule|quality",
+      "mitigation_suggestion": "Set up monitoring and alerting for staging, file an infrastructure ticket, and consider using a temporary stable test environment."
+    },
+    {
+      "risk_id": "R-4",
+      "description": "Automated KYC document verification rejects valid government ID uploads due to image compression, blocking end\u2011to\u2011end onboarding.",
+      "severity": "high",
       "impact": "scope|quality",
-      "mitigation_suggestion": "Evaluate alternative UI libraries, conduct an accessibility audit, and plan for replacement if necessary"
+      "mitigation_suggestion": "Investigate the compression algorithm, adjust quality settings, add a manual review fallback, and re\u2011run verification tests."
+    },
+    {
+      "risk_id": "R-5",
+      "description": "Load testing on the payment flow has not yet been conducted, leaving performance risks unvalidated.",
+      "severity": "medium",
+      "impact": "quality|cost",
+      "mitigation_suggestion": "Schedule load testing early, define performance benchmarks, and address bottlenecks before release."
+    },
+    {
+      "risk_id": "R-6",
+      "description": "Backend integration remains behind schedule, increasing the risk of missing the end\u2011of\u2011month release.",
+      "severity": "high",
+      "impact": "schedule",
+      "mitigation_suggestion": "Allocate additional resources, prioritize integration tasks, monitor progress daily, and adjust the release plan if necessary."
     }
   ],
   "action_item_list": [
     {
       "item": "Payment gateway vendor has not provided updated API credentials",
-      "owner": "Arjun",
+      "owner": "N/A",
+      "status": "Blocked",
+      "source": "blocker"
+    },
+    {
+      "item": "Staging environment instability",
+      "owner": "N/A",
+      "status": "Blocked",
+      "source": "blocker"
+    },
+    {
+      "item": "Lack of updated API credentials from payment gateway vendor",
+      "owner": "N/A",
+      "status": "Blocked",
+      "source": "blocker"
+    },
+    {
+      "item": "Staging environment instability",
+      "owner": "N/A",
       "status": "Blocked",
       "source": "blocker"
     },
@@ -75,7 +114,7 @@
       "source": "action_item"
     },
     {
-      "item": "Integrate third-party payment gateway",
+      "item": "Integrate third\u2011party payment gateway",
       "owner": "Arjun",
       "status": "Blocked",
       "source": "action_item"
@@ -87,27 +126,21 @@
       "source": "action_item"
     },
     {
-      "item": "Escalate payment gateway credential delay to vendor account manager",
-      "owner": "Arjun",
-      "status": "Not specified",
-      "source": "action_item"
-    },
-    {
-      "item": "Evaluate alternative UI libraries for accessibility compliance",
+      "item": "Build client onboarding dashboard UI",
       "owner": "Neha",
-      "status": "Not specified",
+      "status": "In Progress",
       "source": "action_item"
     },
     {
-      "item": "File an infrastructure ticket for staging environment instability",
+      "item": "Set up staging environment monitoring",
       "owner": "Karan",
-      "status": "Not specified",
+      "status": "Not Started",
       "source": "action_item"
     },
     {
-      "item": "Update the risk register and inform stakeholders of possible delay",
-      "owner": "Priya",
-      "status": "Not specified",
+      "item": "Conduct load testing on payment flow",
+      "owner": "Arjun",
+      "status": "Not Started",
       "source": "action_item"
     }
   ]
