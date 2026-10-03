@@ -1,41 +1,47 @@
 {
   "risks": [
     {
-      "description": "Delay in receiving production API credentials from the third\u2011party payment vendor, blocking backend integration and threatening the release date.",
+      "description": "Delay in receiving third\u2011party payment vendor API credentials and sandbox access, blocking backend integration and threatening the release date",
       "likely_impact": "schedule",
       "severity": "high",
-      "evidence_source": "status_report.pdf; notes.txt; progress_update_sep20.txt"
+      "evidence_source": "project_proposal.docx; status_report.pdf"
     },
     {
-      "description": "Chosen UI component library may not satisfy WCAG 2.1 AA accessibility requirements, potentially requiring rework of the onboarding dashboard.",
+      "description": "Chosen UI component library may not fully meet WCAG 2.1 AA accessibility requirements, potentially requiring mid\u2011project replacement",
       "likely_impact": "scope|quality",
       "severity": "medium",
       "evidence_source": "project_proposal.docx; notes.txt"
     },
     {
-      "description": "Staging environment instability blocked QA regression testing for multiple days, delaying verification of new features.",
+      "description": "Staging environment instability has blocked QA regression testing for multiple days, delaying testing and quality assurance",
       "likely_impact": "schedule|quality",
-      "severity": "medium",
-      "evidence_source": "status_report.pdf; progress_update_sep20.txt"
+      "severity": "high",
+      "evidence_source": "status_report.pdf; notes.txt"
     },
     {
-      "description": "Automated KYC document verification rejects valid government ID uploads due to image compression, blocking end\u2011to\u2011end onboarding.",
+      "description": "Automated KYC document verification rejects valid government IDs due to image compression degrading scan quality, blocking end\u2011to\u2011end onboarding",
       "likely_impact": "scope|quality",
       "severity": "high",
       "evidence_source": "progress_update_sep20.txt"
     },
     {
-      "description": "Load testing on the payment flow has not yet been conducted, leaving performance risks unvalidated.",
-      "likely_impact": "quality|cost",
-      "severity": "medium",
-      "evidence_source": "small_task_list.csv"
-    },
-    {
-      "description": "Backend integration remains behind schedule, increasing the risk of missing the end\u2011of\u2011month release.",
+      "description": "If vendor credential delay is not resolved within five business days, the end\u2011of\u2011month release date is at risk of slipping by 1\u20132 weeks",
       "likely_impact": "schedule",
       "severity": "high",
-      "evidence_source": "notes.txt; status_report.pdf"
+      "evidence_source": "status_report.pdf"
+    },
+    {
+      "description": "Payment gateway integration is behind schedule because the vendor has not yet shared updated API credentials, creating a critical path risk",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "status_report.pdf; notes.txt"
+    },
+    {
+      "description": "Potential need to replace the UI library mid\u2011development if accessibility compliance cannot be achieved, impacting scope and quality",
+      "likely_impact": "scope|quality",
+      "severity": "medium",
+      "evidence_source": "project_proposal.docx; notes.txt"
     }
   ],
-  "delivery_forecast": "The project is currently at risk of missing the end\u2011of\u2011month release. While the payment gateway credentials have been received and backend work is expected to finish soon, a critical KYC verification defect and earlier staging instability have delayed testing. These issues, combined with the remaining UI accessibility review, mean the project is not on track to meet the original 8\u2011week window."
+  "delivery_forecast": "The project is currently at risk of missing the end\u2011of\u2011month release. While the payment gateway credentials have been obtained and backend work is expected to resume, a critical KYC verification defect and prior staging instability have introduced new blockers that threaten the schedule. The risk register now reflects high\u2011severity issues that could push the release by one to two weeks unless mitigated quickly."
 }

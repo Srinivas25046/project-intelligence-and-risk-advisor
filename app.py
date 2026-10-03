@@ -174,7 +174,7 @@ uploaded_files = st.file_uploader(
     label_visibility="collapsed",
 )
 
-if uploaded_files:
+if uploaded_files and not st.session_state.analysis_done:
     os.makedirs(RAW_DATA_DIR, exist_ok=True)
     for f in os.listdir(RAW_DATA_DIR):
         fp = os.path.join(RAW_DATA_DIR, f)
@@ -184,6 +184,8 @@ if uploaded_files:
         with open(os.path.join(RAW_DATA_DIR, uf.name), "wb") as out:
             out.write(uf.getbuffer())
     st.success(f"{len(uploaded_files)} file(s) ready: {', '.join(f.name for f in uploaded_files)}")
+elif uploaded_files and st.session_state.analysis_done:
+    st.info("Initial analysis already run. Use '➕ Add More Documents' below to add further files without resetting your existing data.")
 
 # =============================================================================
 # STEP 2 — Run analysis

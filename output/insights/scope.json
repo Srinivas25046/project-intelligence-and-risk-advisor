@@ -3,11 +3,11 @@
     "Reduce manual onboarding time from five business days to under one business day"
   ],
   "deliverables": [
-    "Client onboarding module",
     "Payment gateway integration",
     "Onboarding dashboard UI",
     "Automated KYC document verification",
-    "Basic accessibility compliance (WCAG 2.1 AA)"
+    "Basic accessibility compliance (WCAG 2.1 AA)",
+    "Client onboarding module"
   ],
   "milestones": [
     {
@@ -25,48 +25,20 @@
   ],
   "responsibilities": [
     {
-      "owner": "Arjun",
-      "responsibility": "Integrate third-party payment gateway"
+      "owner": "Priya",
+      "responsibility": "Update risk register, inform stakeholders of possible delay, draft stakeholder communication on release delay"
     },
     {
       "owner": "Arjun",
-      "responsibility": "Escalate payment gateway credential delay to vendor account manager"
-    },
-    {
-      "owner": "Arjun",
-      "responsibility": "Conduct load testing on payment flow"
+      "responsibility": "Escalate payment gateway credential delay to vendor account manager, integrate third\u2011party payment gateway, conduct load testing on payment flow"
     },
     {
       "owner": "Neha",
-      "responsibility": "Build client onboarding dashboard UI"
-    },
-    {
-      "owner": "Neha",
-      "responsibility": "Evaluate alternative UI libraries and review accessibility compliance"
+      "responsibility": "Build client onboarding dashboard UI, evaluate alternative UI libraries for accessibility compliance, review accessibility compliance of UI library"
     },
     {
       "owner": "Karan",
-      "responsibility": "Set up staging environment monitoring"
-    },
-    {
-      "owner": "Karan",
-      "responsibility": "Write regression test suite for onboarding flow"
-    },
-    {
-      "owner": "Karan",
-      "responsibility": "File an infrastructure ticket for staging environment instability"
-    },
-    {
-      "owner": "Karan",
-      "responsibility": "Investigate the KYC image compression issue"
-    },
-    {
-      "owner": "Priya",
-      "responsibility": "Update the risk register"
-    },
-    {
-      "owner": "Priya",
-      "responsibility": "Draft stakeholder communication on release delay"
+      "responsibility": "File infrastructure ticket for staging environment instability, set up staging environment monitoring, write regression test suite for onboarding flow"
     }
   ]
 }

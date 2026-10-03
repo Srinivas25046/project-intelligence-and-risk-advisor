@@ -13,7 +13,7 @@
     {
       "description": "Lack of updated API credentials from payment gateway vendor",
       "blocking": "backend integration work and payment gateway integration",
-      "source": "notes.txt"
+      "source": "small_task_list.csv"
     },
     {
       "description": "Staging environment instability",
@@ -38,14 +38,14 @@
       "status": "Blocked"
     },
     {
-      "task": "Integrate third-party payment gateway",
-      "owner": "Arjun",
-      "status": "Blocked"
-    },
-    {
       "task": "Update risk register with vendor delay",
       "owner": "Priya",
       "status": "Done"
+    },
+    {
+      "task": "Integrate third-party payment gateway",
+      "owner": "Arjun",
+      "status": "Blocked"
     },
     {
       "task": "Build client onboarding dashboard UI",
