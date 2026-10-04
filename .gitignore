@@ -1,23 +1,14 @@
-# Python
 venv/
 __pycache__/
 *.pyc
 .env
-
-# Vector store data (regenerated from source docs, not source itself)
 chroma_db/
 *.sqlite3
-
-# OS/editor noise
 .vscode/
 .DS_Store
-
-# Uploaded documents (may contain sensitive project data)
 data/raw/*
 !data/raw/.gitkeep
-
 output/insights/*
 !output/insights/.gitkeep
-
 output/ingestion_manifest.json
 output/last_batch.json
