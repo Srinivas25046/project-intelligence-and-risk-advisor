@@ -1,29 +1,21 @@
 # Project Intelligence & Risk Advisor
 
-An AI-driven platform that ingests enterprise project documents — proposals, reports, task lists, meeting notes — and uses a Retrieval-Augmented Generation (RAG) pipeline with specialized AI agents to automatically surface project risks, scope gaps, and health insights.
+An AI-driven platform that ingests enterprise project documents — proposals, reports, task lists, meeting notes — and uses a Retrieval-Augmented Generation (RAG) pipeline with specialized AI agents to automatically surface project risks, scope gaps, and health insights, presented through an interactive dashboard.
 
 Built as part of an Infosys Springboard internship project on AI-driven enterprise project intelligence.
 
 ## Features
 
-- **Multi-format document ingestion** — parses PDF, DOCX, CSV, and TXT project documents into a unified text representation
-- **Semantic search over project knowledge** — documents are chunked, embedded, and indexed in a vector database, enabling retrieval by meaning rather than exact keyword match
-- **Hybrid retrieval** — combines semantic similarity search with exact metadata filtering (e.g. filtering CSV rows by task status) and multi-query merging, so structured facts aren't missed just because they're not the top semantic match
-- **Multi-agent extraction pipeline** — specialized agents reason over retrieved content to produce structured insights:
-  - **Scope agent** — extracts project goals, deliverables, milestones, and team responsibilities
-  - **Risk agent** — identifies risks, rates their severity and likely impact, and writes a delivery forecast
-  - **Blocker agent** — extracts active blockers and action items, cross-referencing task status so nothing blocked slips through
-- **Resilient, multi-provider LLM backend** — each agent calls out to Google Gemini, Groq, and Cloudflare Workers AI in a rotating fallback chain, so a single provider's rate limit, outage, or deprecated model doesn't take down the pipeline
-- **Local, cost-free embeddings** — runs entirely on CPU with no external API dependency for the retrieval layer
-- **Documentation generation** — produces Agile user stories, a formal risk register with mitigation suggestions, and a consolidated action item list, chained from earlier agents' structured output
-- **Deterministic health scoring** — auditable, formula-based project health score (scope clarity, timeline risk, blocker load) rather than an LLM-generated number
-- **Conversational assistant** — hybrid-grounded Q&A combining a persisted project summary with live document retrieval for specific detail questions
-- **Streamlit dashboard** — a live UI wrapping the full pipeline: ingestion, extraction agents, documentation generation, health scoring, and the conversational assistant, each triggered step-by-step for demo purposes
-
-**Planned:**
-- [ ] Project health scoring dashboard
-- [ ] Conversational Q&A interface over the project knowledge base
-- [ ] Cross-document timeline and dependency tracking
+- **Multi-format document ingestion** — parses PDF, DOCX, CSV, and TXT project documents into a unified text representation, restricted to these supported types at upload
+- **Semantic + hybrid search** — documents are chunked, embedded, and indexed in a vector database; retrieval combines semantic similarity with exact metadata filtering and multi-query merging
+- **Fully automatic end-to-end analysis** — one click runs ingestion, all extraction agents, documentation generation, and health scoring with no further manual steps
+- **Multi-agent extraction pipeline** — specialized agents extract scope, risks, and blockers/action items, each reasoning over retrieved content via LLMs
+- **Resilient, multi-provider LLM backend** — Google Gemini, Groq, and Cloudflare Workers AI in a rotating fallback chain per agent, with in-loop JSON validation so a malformed response triggers fallback instead of being accepted
+- **Automatic documentation generation** — Agile user stories, a risk register with mitigation suggestions, and a consolidated action item list, generated automatically and downloadable as a Word document
+- **Deterministic, explainable health scoring** — an auditable formula across scope clarity, timeline risk, and blocker load, not an opaque AI-generated number
+- **Conversational assistant** — hybrid-grounded Q&A combining a persisted project summary with live document retrieval, presented as a floating chat popup
+- **Incremental document updates** — add new documents at any time; only new or changed files are re-embedded, while extraction agents fully re-run so conclusions always reflect the complete, current picture
+- **Polished interactive dashboard** — built with Streamlit, featuring a health gauge, severity-coded risk/blocker views, and an "at a glance" summary strip
 
 ## Tech Stack
 
@@ -35,7 +27,8 @@ Built as part of an Infosys Springboard internship project on AI-driven enterpri
 | Embeddings | Sentence-Transformers (`all-MiniLM-L6-v2`) |
 | Vector store | ChromaDB |
 | LLM reasoning | Google Gemini, Groq, Cloudflare Workers AI (via OpenAI-compatible client) |
-| UI | Streamlit |
+| Document export | python-docx |
+| UI | Streamlit, Plotly |
 
 ## Architecture
 
@@ -55,28 +48,42 @@ Raw documents (PDF/DOCX/CSV/TXT)
   Vector store     ──▶  indexed for fast semantic + hybrid similarity search
         │
         ▼
-  Agent retrieval   ──▶  each agent pulls the context relevant to its question
+  Agent retrieval   ──▶  each agent pulls the context relevant to its question,
+                          always including the latest document batch
         │
         ▼
   LLM reasoning      ──▶  multi-provider fallback chain (Gemini → Groq → Cloudflare)
         │
         ▼
-  Structured JSON output (scope / risks / blockers)
+  Structured JSON ──▶  Documentation generation ──▶ Health scoring
+        │
+        ▼
+  Interactive dashboard + conversational assistant
 ```
 
 ## Project Structure
 
 ```
 project-intelligence-and-risk-advisor/
-├── data/raw/               # source project documents
+├── .streamlit/
+│   └── config.toml         # native Streamlit theming
+├── data/raw/                # source project documents
+├── output/
+│   ├── insights/            # saved agent outputs (scope, risks, blockers, health, docs)
+│   ├── ingestion_manifest.json  # tracks which files are already indexed
+│   └── last_batch.json      # tracks the most recent ingestion batch
 ├── src/
-│   ├── schemas.py          # core data models (Document, Chunk)
-│   ├── ingestion/          # per-format document loaders
-│   ├── rag/                # chunking, embeddings, vector store
-│   ├── llm/                # multi-provider LLM client with fallback
-│   ├── agents/              # scope, risk, and blocker extraction agents
-│   ├── main.py              # ingestion pipeline entry point
-│   └── run_agents.py        # runs all agents against the indexed data
+│   ├── schemas.py            # core data models (Document, Chunk)
+│   ├── ingestion/            # per-format document loaders + incremental manifest
+│   ├── rag/                  # chunking, embeddings, vector store
+│   ├── llm/                  # multi-provider LLM client with fallback
+│   ├── agents/                # scope, risk, blocker, and documentation agents
+│   ├── chat_agent.py          # conversational assistant
+│   ├── health_score.py        # deterministic health scoring
+│   ├── doc_export.py          # Word document generation
+│   ├── main.py                 # ingestion pipeline entry point (CLI)
+│   └── run_agents.py           # runs all agents against indexed data (CLI)
+├── app.py                     # Streamlit dashboard entry point
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -101,31 +108,22 @@ CLOUDFLARE_ACCOUNT_ID=your_account_id_here
 
 ## Usage
 
-**1. Ingest documents and build the vector index:**
-
-Place project documents in `data/raw/`, then run:
-
-```bash
-python -m src.main
-```
-
-This parses every document, chunks it, generates embeddings, and stores everything in a local ChromaDB index.
-
-**2. Run the extraction agents:**
-
-```bash
-python -m src.run_agents
-```
-
-This retrieves relevant context for each agent, sends it to an LLM for reasoning, and prints structured JSON output for scope, risks, and blockers/action items.
-
-**3. Launch the interactive dashboard:**
+**Interactive dashboard (recommended):**
 
 ```bash
 streamlit run app.py
 ```
 
-Opens a browser UI where each pipeline stage (ingestion, agents, documentation, health score) runs on demand via sidebar buttons, with a chat tab for querying the project interactively.
+Upload PDF/DOCX/CSV/TXT files, click **Run Full Analysis**, and explore the Health, Scope, Risks, Blockers, and Documentation tabs. Add further documents at any time via **Add More Documents** to incrementally update the knowledge base and refresh all insights. Use the floating chat icon to ask questions about the project.
+
+**Command-line pipeline (for development/testing):**
+
+```bash
+python -m src.main          # ingest documents and build the vector index
+python -m src.run_agents    # run all extraction agents and save insights
+python -m src.health_score  # compute the deterministic health score
+python -m src.chat_agent    # interactive terminal chat session
+```
 
 ## License
 
