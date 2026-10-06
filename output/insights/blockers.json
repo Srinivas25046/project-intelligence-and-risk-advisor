@@ -12,13 +12,13 @@
     },
     {
       "description": "Lack of updated API credentials from payment gateway vendor",
-      "blocking": "backend integration work and payment gateway integration",
+      "blocking": "Integrate third-party payment gateway",
       "source": "small_task_list.csv"
     },
     {
       "description": "Staging environment instability",
-      "blocking": "regression testing",
-      "source": "progress_update_sep20.txt"
+      "blocking": "Write regression test suite for onboarding flow",
+      "source": "small_task_list.csv"
     }
   ],
   "action_items": [

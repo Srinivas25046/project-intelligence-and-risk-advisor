@@ -1,47 +1,41 @@
 {
   "risks": [
     {
-      "description": "Delay in receiving third\u2011party payment vendor API credentials and sandbox access, blocking backend integration and threatening the release date",
+      "description": "Delay in receiving third\u2011party payment vendor API credentials and sandbox access, blocking backend integration.",
       "likely_impact": "schedule",
       "severity": "high",
       "evidence_source": "project_proposal.docx; status_report.pdf"
     },
     {
-      "description": "Chosen UI component library may not fully meet WCAG 2.1 AA accessibility requirements, potentially requiring mid\u2011project replacement",
+      "description": "Chosen UI component library may not fully meet WCAG 2.1 AA accessibility requirements, potentially requiring mid\u2011project replacement.",
       "likely_impact": "scope|quality",
       "severity": "medium",
       "evidence_source": "project_proposal.docx; notes.txt"
     },
     {
-      "description": "Staging environment instability has blocked QA regression testing for multiple days, delaying testing and quality assurance",
+      "description": "Staging environment instability blocking QA regression testing for multiple days.",
       "likely_impact": "schedule|quality",
       "severity": "high",
       "evidence_source": "status_report.pdf; notes.txt"
     },
     {
-      "description": "Automated KYC document verification rejects valid government IDs due to image compression degrading scan quality, blocking end\u2011to\u2011end onboarding",
-      "likely_impact": "scope|quality",
+      "description": "Automated KYC verification service rejects valid government ID uploads due to image compression degrading scan quality.",
+      "likely_impact": "scope|schedule|quality",
       "severity": "high",
       "evidence_source": "progress_update_sep20.txt"
     },
     {
-      "description": "If vendor credential delay is not resolved within five business days, the end\u2011of\u2011month release date is at risk of slipping by 1\u20132 weeks",
-      "likely_impact": "schedule",
-      "severity": "high",
-      "evidence_source": "status_report.pdf"
-    },
-    {
-      "description": "Payment gateway integration is behind schedule because the vendor has not yet shared updated API credentials, creating a critical path risk",
-      "likely_impact": "schedule",
-      "severity": "high",
-      "evidence_source": "status_report.pdf; notes.txt"
-    },
-    {
-      "description": "Potential need to replace the UI library mid\u2011development if accessibility compliance cannot be achieved, impacting scope and quality",
+      "description": "Potential need to replace UI library mid\u2011development if accessibility gaps are found, leading to rework.",
       "likely_impact": "scope|quality",
       "severity": "medium",
       "evidence_source": "project_proposal.docx; notes.txt"
+    },
+    {
+      "description": "If vendor credential delay is not resolved within five business days, the end\u2011of\u2011month release date risks slipping by 1\u20132 weeks.",
+      "likely_impact": "schedule",
+      "severity": "high",
+      "evidence_source": "status_report.pdf"
     }
   ],
-  "delivery_forecast": "The project is currently at risk of missing the end\u2011of\u2011month release. While the payment gateway credentials have been obtained and backend work is expected to resume, a critical KYC verification defect and prior staging instability have introduced new blockers that threaten the schedule. The risk register now reflects high\u2011severity issues that could push the release by one to two weeks unless mitigated quickly."
+  "delivery_forecast": "The project is currently at\u2011risk. While the vendor credential delay has been resolved and backend work is resuming, a new critical issue with KYC verification has emerged, blocking end\u2011to\u2011end onboarding. Combined with ongoing staging environment instability and potential UI accessibility rework, the project faces significant schedule and scope risks that could delay the planned end\u2011of\u2011month release."
 }

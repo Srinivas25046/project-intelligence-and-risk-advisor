@@ -1,13 +1,12 @@
 {
   "project_goals": [
-    "Reduce manual onboarding time from five business days to under one business day"
+    "Reduce manual onboarding time from five business days to under one business day."
   ],
   "deliverables": [
     "Payment gateway integration",
     "Onboarding dashboard UI",
     "Automated KYC document verification",
-    "Basic accessibility compliance (WCAG 2.1 AA)",
-    "Client onboarding module"
+    "Basic accessibility compliance (WCAG 2.1 AA)"
   ],
   "milestones": [
     {
@@ -26,19 +25,59 @@
   "responsibilities": [
     {
       "owner": "Priya",
-      "responsibility": "Update risk register, inform stakeholders of possible delay, draft stakeholder communication on release delay"
+      "responsibility": "update risk register"
+    },
+    {
+      "owner": "Priya",
+      "responsibility": "inform stakeholders of possible delay"
+    },
+    {
+      "owner": "Priya",
+      "responsibility": "draft stakeholder communication on release delay"
+    },
+    {
+      "owner": "Priya",
+      "responsibility": "update risk register to reflect resolved vendor delay and new KYC verification defect"
     },
     {
       "owner": "Arjun",
-      "responsibility": "Escalate payment gateway credential delay to vendor account manager, integrate third\u2011party payment gateway, conduct load testing on payment flow"
+      "responsibility": "integrate third-party payment gateway"
+    },
+    {
+      "owner": "Arjun",
+      "responsibility": "escalate payment gateway credential delay to vendor account manager"
+    },
+    {
+      "owner": "Arjun",
+      "responsibility": "conduct load testing on payment flow"
     },
     {
       "owner": "Neha",
-      "responsibility": "Build client onboarding dashboard UI, evaluate alternative UI libraries for accessibility compliance, review accessibility compliance of UI library"
+      "responsibility": "build client onboarding dashboard UI"
+    },
+    {
+      "owner": "Neha",
+      "responsibility": "review accessibility compliance of UI library"
+    },
+    {
+      "owner": "Neha",
+      "responsibility": "evaluate alternative UI libraries for accessibility compliance"
     },
     {
       "owner": "Karan",
-      "responsibility": "File infrastructure ticket for staging environment instability, set up staging environment monitoring, write regression test suite for onboarding flow"
+      "responsibility": "set up staging environment monitoring"
+    },
+    {
+      "owner": "Karan",
+      "responsibility": "write regression test suite for onboarding flow"
+    },
+    {
+      "owner": "Karan",
+      "responsibility": "file infrastructure ticket for staging environment instability"
+    },
+    {
+      "owner": "Karan",
+      "responsibility": "investigate KYC image compression issue"
     }
   ]
 }

@@ -7,24 +7,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.ingestion.loaders import load_document
-from src.ingestion.manifest import get_new_or_changed_files, mark_ingested
+from src.ingestion.manifest import get_new_or_changed_files, mark_ingested, save_last_batch
 from src.rag.chunking import chunk_document
 from src.rag.vector_store import index_chunks, delete_by_filename
 from src.agents.scope_agent import ScopeExtractionAgent
 from src.agents.risk_agent import RiskForecastingAgent
 from src.agents.blocker_agent import BlockerActionItemAgent
-from src.agents.doc_gen_agent import generate_documentation
+from src.agents.doc_gen_agent import generate_user_stories, generate_risk_register, generate_action_items
 from src.health_score import compute_health_score
 from src.insights_store import save_insight, load_insight
 from src.chat_agent import ChatAssistant
-from src.doc_export import build_documentation_docx
-from src.ingestion.manifest import get_new_or_changed_files, mark_ingested, save_last_batch
+from src.doc_export import build_user_stories_docx, build_risk_register_docx, build_action_items_docx, build_combined_docx
 
 RAW_DATA_DIR = "data/raw"
 st.set_page_config(page_title="Project Intelligence & Risk Advisor", page_icon="📊", layout="wide")
 
 # =============================================================================
-# THEME — spacing pass: more breathing room on the page, hero, cards, rows
+# THEME
 # =============================================================================
 st.markdown("""
 <style>
@@ -35,7 +34,6 @@ h1, h2, h3, h4, .hero h1, .section-title { font-family: 'Space Grotesk', sans-se
 
 .block-container { padding: 2.5rem 3rem 4rem 3rem; max-width: 1280px; }
 
-/* ---------- Hero ---------- */
 @keyframes auroraShift {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
@@ -54,7 +52,6 @@ h1, h2, h3, h4, .hero h1, .section-title { font-family: 'Space Grotesk', sans-se
 .hero h1 { margin: 0; font-size: 2.3rem; font-weight: 700; color: white !important; }
 .hero p { margin: 0.7rem 0 0 0; opacity: 0.92; font-size: 1.05rem; color: #EDE9FE; max-width: 640px; }
 
-/* ---------- Snapshot stat strip ---------- */
 .stat-card {
     background: #141B2D;
     border: 1px solid #232B42;
@@ -64,13 +61,11 @@ h1, h2, h3, h4, .hero h1, .section-title { font-family: 'Space Grotesk', sans-se
 .stat-label { font-size: 0.82rem; color: #94A3B8; font-weight: 500; margin-bottom: 0.4rem; }
 .stat-value { font-size: 1.9rem; font-weight: 700; color: #F1F5F9; }
 
-/* ---------- Section titles ---------- */
 .section-title {
     font-size: 1.25rem; font-weight: 600; color: #F1F5F9;
     margin: 1.8rem 0 1.1rem 0; display: flex; align-items: center; gap: 10px;
 }
 
-/* ---------- Risk / blocker rows ---------- */
 .row-high, .row-blocked    { border-left: 4px solid #EF4444; padding: 10px 0 10px 16px; }
 .row-medium, .row-progress { border-left: 4px solid #F59E0B; padding: 10px 0 10px 16px; }
 .row-low, .row-done        { border-left: 4px solid #22C55E; padding: 10px 0 10px 16px; }
@@ -85,7 +80,6 @@ h1, h2, h3, h4, .hero h1, .section-title { font-family: 'Space Grotesk', sans-se
 .tag-low, .tag-done { background: rgba(34,197,94,0.15); color: #86EFAC; }
 .tag-other { background: rgba(100,116,139,0.2); color: #CBD5E1; }
 
-/* ---------- Floating chat bubble ---------- */
 @keyframes pulseRing {
     0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.55); }
     70%  { box-shadow: 0 0 0 16px rgba(99, 102, 241, 0); }
@@ -135,7 +129,10 @@ def status_class(status):
     return "other"
 
 
-def run_all_agents_and_downstream(status):
+def run_agents_pipeline(status):
+    """Extraction agents + health score only. Documentation is NOT generated
+    automatically — it is only produced when the user explicitly requests
+    each document type in the Documentation tab."""
     status.write("🧠 Extracting scope, risks, and blockers...")
     for name, agent in {
         "scope": ScopeExtractionAgent(),
@@ -147,13 +144,6 @@ def run_all_agents_and_downstream(status):
             status.write(f"✅ {name.capitalize()} agent complete.")
         except Exception as e:
             status.write(f"⚠️ {name.capitalize()} agent failed: {e}")
-
-    status.write("📄 Generating documentation...")
-    try:
-        generate_documentation()
-        status.write("✅ Documentation generated.")
-    except Exception as e:
-        status.write(f"⚠️ Documentation generation failed: {e}")
 
     status.write("❤️ Computing health score...")
     try:
@@ -212,7 +202,7 @@ if st.button("Run Full Analysis", type="primary", disabled=not uploaded_files, u
         save_last_batch([f.name for f in uploaded_files])
         status.write(f"✅ Indexed {len(all_chunks)} chunks.")
 
-        run_all_agents_and_downstream(status)
+        run_agents_pipeline(status)
         status.update(label="Analysis complete!", state="complete", expanded=False)
 
     st.session_state.analysis_done = True
@@ -230,7 +220,6 @@ st.divider()
 # =============================================================================
 if st.session_state.analysis_done:
 
-    # ---- "At a glance" snapshot strip — the literal dashboard moment ----
     health = try_load("health_score")
     scope = try_load("scope")
     risks = try_load("risks")
@@ -260,11 +249,76 @@ if st.session_state.analysis_done:
 
     st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
 
-    tab_overview, tab_scope, tab_risks, tab_blockers, tab_docs = st.tabs(
-        ["❤️ Health", "📋 Scope", "⚠️ Risks", "🚧 Blockers", "📄 Documentation"]
+    tab_dashboard, tab_health, tab_scope, tab_risks, tab_blockers, tab_docs = st.tabs(
+        ["📊 Dashboard", "❤️ Health", "📋 Scope", "⚠️ Risks", "🚧 Blockers", "📄 Documentation"]
     )
 
-    with tab_overview:
+    # ---------------- DASHBOARD: unified Project Insights & Risk Summary ----------------
+    with tab_dashboard:
+        st.markdown("### Project Insights & Risk Summary")
+        st.caption("A single-glance view of project health, top risks, outstanding action items, and scope.")
+
+        d_col1, d_col2 = st.columns([1, 1.4])
+
+        with d_col1:
+            with st.container(border=True):
+                st.markdown("**❤️ Health Score**")
+                if health:
+                    fig = go.Figure(go.Indicator(
+                        mode="gauge+number",
+                        value=overall,
+                        number={"suffix": "/100", "font": {"color": "#F1F5F9"}},
+                        gauge={
+                            "axis": {"range": [0, 100], "tickcolor": "#64748B"},
+                            "bar": {"color": status_color},
+                            "bgcolor": "#141B2D",
+                            "steps": [
+                                {"range": [0, 40], "color": "rgba(239,68,68,0.15)"},
+                                {"range": [40, 70], "color": "rgba(245,158,11,0.15)"},
+                                {"range": [70, 100], "color": "rgba(34,197,94,0.15)"},
+                            ],
+                        },
+                    ))
+                    fig.update_layout(height=220, margin=dict(t=10, b=10, l=20, r=20),
+                                       paper_bgcolor="rgba(0,0,0,0)", font={"color": "#F1F5F9"})
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("Not available yet.")
+
+            with st.container(border=True):
+                st.markdown("**🎯 Scope Summary**")
+                if scope:
+                    st.markdown("*Goals:*")
+                    for g in scope.get("project_goals", [])[:3]:
+                        st.write(f"- {g}")
+                    st.markdown("*Deliverables:*")
+                    for d in scope.get("deliverables", [])[:4]:
+                        st.write(f"- {d}")
+
+        with d_col2:
+            with st.container(border=True):
+                st.markdown("**⚠️ Top Risks**")
+                if risks:
+                    for r in risks.get("risks", [])[:4]:
+                        cls = sev_class(r.get("severity"))
+                        st.markdown(f"""
+                        <div class="row-{cls}" style="margin:8px 0;">
+                            <span class="tag tag-{cls}">{(r.get('severity') or '').upper()}</span>
+                            <span style="color:#F1F5F9; margin-left:8px;">{r.get('description')}</span>
+                        </div>""", unsafe_allow_html=True)
+
+            with st.container(border=True):
+                st.markdown("**✅ Action Items**")
+                if blockers:
+                    for a in blockers.get("action_items", [])[:6]:
+                        cls = status_class(a.get("status"))
+                        st.markdown(f"""
+                        <div class="row-{cls}" style="margin:6px 0; display:flex; justify-content:space-between;">
+                            <span style="color:#F1F5F9;">{a.get('task')} <span style="color:#94A3B8;">— {a.get('owner')}</span></span>
+                            <span class="tag tag-{cls}">{a.get('status')}</span>
+                        </div>""", unsafe_allow_html=True)
+
+    with tab_health:
         if health:
             col_gauge, col_cards = st.columns([1, 1.3])
             with col_gauge:
@@ -287,7 +341,6 @@ if st.session_state.analysis_done:
                 fig.update_layout(height=320, margin=dict(t=60, b=20, l=30, r=30),
                                    paper_bgcolor="rgba(0,0,0,0)", font={"color": "#F1F5F9"})
                 st.plotly_chart(fig, use_container_width=True)
-
             with col_cards:
                 breakdown = health.get("breakdown", {})
                 for label, key in [("Scope Clarity", "scope_clarity"), ("Timeline Risk", "timeline_risk"), ("Blocker Load", "blocker_load")]:
@@ -297,7 +350,6 @@ if st.session_state.analysis_done:
                         st.markdown(f"**{label}**")
                         st.progress(val / 100)
                         st.markdown(f"<span style='color:{color}; font-weight:700;'>{val}/100</span>", unsafe_allow_html=True)
-
             with st.container(border=True):
                 st.markdown("**Why this score?**")
                 st.write(health.get("rationale", ""))
@@ -348,7 +400,6 @@ if st.session_state.analysis_done:
                     <strong style="color:#F1F5F9;">{b.get('description')}</strong><br>
                     <span style="color:#94A3B8; font-size:0.85rem;">Blocking: {b.get('blocking')} · Source: {b.get('source')}</span>
                 </div>""", unsafe_allow_html=True)
-
             st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
             st.markdown("**✅ Action Items**")
             for a in blockers.get("action_items", []):
@@ -359,36 +410,110 @@ if st.session_state.analysis_done:
                     <span class="tag tag-{cls}">{a.get('status')}</span>
                 </div>""", unsafe_allow_html=True)
 
+    # ---------------- DOCUMENTATION: manual, per-document generation, stacked layout ----------------
     with tab_docs:
-        doc_data = try_load("documentation")
-        if doc_data:
-            # Download action now leads the tab, front and center.
-            docx_bytes = build_documentation_docx(doc_data)
+        st.caption("Generate each document independently. Nothing is generated automatically — click a button below to create it.")
+
+        with st.container(border=True):
+            st.markdown("**📝 User Stories**")
+            gen_col, dl_col = st.columns([1, 1])
+            with gen_col:
+                if st.button("Generate User Stories", use_container_width=True, key="gen_us"):
+                    with st.spinner("Generating..."):
+                        try:
+                            generate_user_stories()
+                            st.success("Generated.")
+                        except Exception as e:
+                            st.error(f"Failed: {e}")
+            us_data = try_load("doc_user_stories")
+            with dl_col:
+                if us_data:
+                    st.download_button(
+                        "⬇️ Download",
+                        data=build_user_stories_docx(us_data),
+                        file_name="User_Stories.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True,
+                        key="dl_us",
+                    )
+            if us_data:
+                st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
+                for us in us_data.get("user_stories", []):
+                    st.write(f"As a **{us.get('role')}**, I want to {us.get('goal')} so that {us.get('benefit')}.")
+
+        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+
+        with st.container(border=True):
+            st.markdown("**⚠️ Risk Register**")
+            gen_col, dl_col = st.columns([1, 1])
+            with gen_col:
+                if st.button("Generate Risk Register", use_container_width=True, key="gen_rr"):
+                    with st.spinner("Generating..."):
+                        try:
+                            generate_risk_register()
+                            st.success("Generated.")
+                        except Exception as e:
+                            st.error(f"Failed: {e}")
+            rr_data = try_load("doc_risk_register")
+            with dl_col:
+                if rr_data:
+                    st.download_button(
+                        "⬇️ Download",
+                        data=build_risk_register_docx(rr_data),
+                        file_name="Risk_Register.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True,
+                        key="dl_rr",
+                    )
+            if rr_data:
+                st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
+                st.table(rr_data.get("risk_register", []))
+
+        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+
+        with st.container(border=True):
+            st.markdown("**✅ Action Item List**")
+            gen_col, dl_col = st.columns([1, 1])
+            with gen_col:
+                if st.button("Generate Action Items", use_container_width=True, key="gen_ai"):
+                    with st.spinner("Generating..."):
+                        try:
+                            generate_action_items()
+                            st.success("Generated.")
+                        except Exception as e:
+                            st.error(f"Failed: {e}")
+            ai_data = try_load("doc_action_items")
+            with dl_col:
+                if ai_data:
+                    st.download_button(
+                        "⬇️ Download",
+                        data=build_action_items_docx(ai_data),
+                        file_name="Action_Items.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True,
+                        key="dl_ai",
+                    )
+            if ai_data:
+                st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
+                st.table(ai_data.get("action_item_list", []))
+
+        us_data = try_load("doc_user_stories")
+        rr_data = try_load("doc_risk_register")
+        ai_data = try_load("doc_action_items")
+        if us_data and rr_data and ai_data:
+            st.divider()
             st.download_button(
-                "⬇️ Download Documentation as Word Document",
-                data=docx_bytes,
+                "⬇️ Download All as One Combined Document",
+                data=build_combined_docx(us_data, rr_data, ai_data),
                 file_name="Project_Documentation.docx",
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 use_container_width=True,
             )
-            st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
 
-            st.markdown("**User Stories**")
-            for us in doc_data.get("user_stories", []):
-                st.write(f"As a **{us.get('role')}**, I want to {us.get('goal')} so that {us.get('benefit')}.")
-            st.markdown("**Risk Register**")
-            st.table(doc_data.get("risk_register", []))
-            st.markdown("**Action Item List**")
-            st.table(doc_data.get("action_item_list", []))
-        else:
-            st.info("Documentation will appear here after running the analysis.")
-
-    # -------------------------------------------------------------------
-    # Incremental document upload
-    # -------------------------------------------------------------------
+    # ---------------- Incremental upload ----------------
     st.divider()
     st.markdown('<div class="section-title">➕ Add More Documents</div>', unsafe_allow_html=True)
-    st.caption("Add new meeting notes or progress updates — the knowledge base updates incrementally, and insights automatically refresh to reflect the latest information.")
+    st.caption("Add new meeting notes or progress updates — the knowledge base updates incrementally, and insights automatically refresh.")
 
     new_files = st.file_uploader(
         "Add additional PDF, DOCX, CSV, or TXT files",
@@ -413,7 +538,7 @@ if st.session_state.analysis_done:
                     filepath = os.path.join(RAW_DATA_DIR, filename)
                     try:
                         document = load_document(filepath)
-                    except ValueError:
+                    except Exception:
                         continue
                     chunks = chunk_document(document)
                     delete_by_filename(filename)
@@ -423,11 +548,11 @@ if st.session_state.analysis_done:
                     index_chunks(new_chunks)
                     mark_ingested(RAW_DATA_DIR, to_process)
                     save_last_batch(to_process)
-                    status.write(f"✅ Indexed {len(new_chunks)} new chunks (existing documents were not reprocessed).")
+                    status.write(f"✅ Indexed {len(new_chunks)} new chunks.")
                 else:
                     status.write("ℹ️ No new content to index.")
 
-                run_all_agents_and_downstream(status)
+                run_agents_pipeline(status)
                 status.update(label="Knowledge base and insights updated!", state="complete", expanded=False)
 
             if "assistant" in st.session_state:
