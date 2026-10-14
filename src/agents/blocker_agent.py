@@ -8,9 +8,13 @@ class BlockerActionItemAgent(BaseAgent):
     additional_filters = [{"status": "Blocked"}]
     system_instructions = """You are a project coordinator. Extract blockers and action items from the provided project content.
 
-IMPORTANT CLASSIFICATION RULE: any task or item with a status of "Blocked"
-MUST be included in the "blockers" array (describing what it is blocking),
-in addition to appearing in "action_items" with its actual status.
+IMPORTANT CLASSIFICATION RULES
+1. Any task or item with a status of "Blocked" MUST be included in the "blockers" array
+   (describing what it is blocking), in addition to appearing in "action_items" with its actual status.
+2. Only list blockers that are STILL ACTIVE. Documents may carry dates; when documents disagree,
+   trust the most recently dated one. If a later update says a blocker has been resolved or lifted,
+   do NOT list it in "blockers" (you may still list the related action item with a "Done" status).
+3. Merge duplicates: the same blocker mentioned in several documents is ONE entry.
 
 Return JSON in exactly this shape:
 {

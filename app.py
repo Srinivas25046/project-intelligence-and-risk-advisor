@@ -15,8 +15,10 @@ from src.agents.risk_agent import RiskForecastingAgent
 from src.agents.blocker_agent import BlockerActionItemAgent
 from src.agents.doc_gen_agent import generate_user_stories, generate_risk_register, generate_action_items
 from src.health_score import compute_health_score
+from src.health_history import record_health, load_history, latest_delta, reset_history
 from src.insights_store import save_insight, load_insight
 from src.chat_agent import ChatAssistant
+from src.risk_matrix import render_risk_matrix_tab
 from src.doc_export import build_user_stories_docx, build_risk_register_docx, build_action_items_docx, build_combined_docx
 
 RAW_DATA_DIR = "data/raw"
@@ -129,10 +131,21 @@ def status_class(status):
     return "other"
 
 
-def run_agents_pipeline(status):
-    """Extraction agents + health score only. Documentation is NOT generated
-    automatically — it is only produced when the user explicitly requests
-    each document type in the Documentation tab."""
+def risk_meta_line(risk):
+    """Category, likelihood/impact (when the agent supplied them) and source."""
+    parts = [f"Category: {risk.get('likely_impact')}"]
+    if risk.get("probability") is not None:
+        parts.append(f"Likelihood: {risk.get('probability')}%")
+    if risk.get("impact") is not None:
+        parts.append(f"Impact: {risk.get('impact')}%")
+    parts.append(f"Source: {risk.get('evidence_source')}")
+    return " · ".join(parts)
+
+
+def run_agents_pipeline(status, label):
+    """Extraction agents + health score, then one entry in the health history.
+    Documentation is NOT generated automatically — it is only produced when
+    the user explicitly requests each document in the Documentation tab."""
     status.write("🧠 Extracting scope, risks, and blockers...")
     for name, agent in {
         "scope": ScopeExtractionAgent(),
@@ -147,8 +160,16 @@ def run_agents_pipeline(status):
 
     status.write("❤️ Computing health score...")
     try:
-        compute_health_score()
-        status.write("✅ Health score computed.")
+        health_result = compute_health_score()
+        risks_now = try_load("risks") or {}
+        blockers_now = try_load("blockers") or {}
+        record_health(
+            label,
+            health_result,
+            len(risks_now.get("risks", [])),
+            len(blockers_now.get("blockers", [])),
+        )
+        status.write(f"✅ Health score computed: {health_result.get('overall_health_score')}/100")
     except Exception as e:
         status.write(f"⚠️ Health score failed: {e}")
 
@@ -183,6 +204,7 @@ elif uploaded_files and st.session_state.analysis_done:
 st.markdown('<div class="section-title">🚀 Run Analysis</div>', unsafe_allow_html=True)
 
 if st.button("Run Full Analysis", type="primary", disabled=not uploaded_files, use_container_width=True):
+    reset_history()  # a fresh initial analysis starts a fresh health trend
     with st.status("Running full project analysis...", expanded=True) as status:
         status.write("📥 Ingesting documents...")
         all_chunks = []
@@ -202,7 +224,7 @@ if st.button("Run Full Analysis", type="primary", disabled=not uploaded_files, u
         save_last_batch([f.name for f in uploaded_files])
         status.write(f"✅ Indexed {len(all_chunks)} chunks.")
 
-        run_agents_pipeline(status)
+        run_agents_pipeline(status, f"Initial analysis ({len(uploaded_files)} files)")
         status.update(label="Analysis complete!", state="complete", expanded=False)
 
     st.session_state.analysis_done = True
@@ -224,16 +246,28 @@ if st.session_state.analysis_done:
     scope = try_load("scope")
     risks = try_load("risks")
     blockers = try_load("blockers")
+    history = load_history()
 
     overall = health.get("overall_health_score", 0) if health else 0
     status_color = "#22C55E" if overall >= 70 else "#F59E0B" if overall >= 40 else "#EF4444"
     status_label = "Healthy" if overall >= 70 else "At Risk" if overall >= 40 else "Critical"
 
+    delta = latest_delta(history)
+    delta_html = ""
+    if delta is not None:
+        if delta > 0:
+            delta_html = f'<div style="color:#22C55E; font-size:0.8rem; font-weight:600;">▲ +{delta} since last update</div>'
+        elif delta < 0:
+            delta_html = f'<div style="color:#EF4444; font-size:0.8rem; font-weight:600;">▼ {delta} since last update</div>'
+        else:
+            delta_html = '<div style="color:#94A3B8; font-size:0.8rem; font-weight:600;">no change since last update</div>'
+
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""<div class="stat-card"><div class="stat-label">Overall Health</div>
             <div class="stat-value" style="color:{status_color};">{overall}/100</div>
-            <div style="color:{status_color}; font-size:0.85rem; font-weight:600;">{status_label}</div></div>""", unsafe_allow_html=True)
+            <div style="color:{status_color}; font-size:0.85rem; font-weight:600;">{status_label}</div>
+            {delta_html}</div>""", unsafe_allow_html=True)
     with c2:
         n_risks = len(risks.get("risks", [])) if risks else 0
         st.markdown(f"""<div class="stat-card"><div class="stat-label">Open Risks</div>
@@ -249,8 +283,8 @@ if st.session_state.analysis_done:
 
     st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
 
-    tab_dashboard, tab_health, tab_scope, tab_risks, tab_blockers, tab_docs = st.tabs(
-        ["📊 Dashboard", "❤️ Health", "📋 Scope", "⚠️ Risks", "🚧 Blockers", "📄 Documentation"]
+    tab_dashboard, tab_health, tab_scope, tab_risks, tab_matrix, tab_blockers, tab_docs = st.tabs(
+        ["📊 Dashboard", "❤️ Health", "📋 Scope", "⚠️ Risks", "🎯 Risk Matrix", "🚧 Blockers", "📄 Documentation"]
     )
 
     # ---------------- DASHBOARD: unified Project Insights & Risk Summary ----------------
@@ -318,6 +352,7 @@ if st.session_state.analysis_done:
                             <span class="tag tag-{cls}">{a.get('status')}</span>
                         </div>""", unsafe_allow_html=True)
 
+    # ---------------- HEALTH: gauge, breakdown, rationale, trend ----------------
     with tab_health:
         if health:
             col_gauge, col_cards = st.columns([1, 1.3])
@@ -353,6 +388,45 @@ if st.session_state.analysis_done:
             with st.container(border=True):
                 st.markdown("**Why this score?**")
                 st.write(health.get("rationale", ""))
+
+            if history:
+                with st.container(border=True):
+                    st.markdown("**📈 Health Trend Across Updates**")
+                    st.caption("Every analysis run is recorded, so you can see exactly how each newly added document moved the score.")
+                    fig_t = go.Figure(go.Scatter(
+                        x=[f"Run {h['run']}" for h in history],
+                        y=[h["overall"] for h in history],
+                        mode="lines+markers+text",
+                        text=[str(h["overall"]) for h in history],
+                        textposition="top center",
+                        textfont=dict(color="#F1F5F9", size=13),
+                        line=dict(color="#6366F1", width=3),
+                        marker=dict(size=12, color="#DB2777", line=dict(width=2, color="#F1F5F9")),
+                        customdata=[[h["label"], h["risks"], h["blockers"]] for h in history],
+                        hovertemplate=("<b>%{x}</b><br>%{customdata[0]}<br>Health: %{y}/100<br>"
+                                       "Risks: %{customdata[1]} · Blockers: %{customdata[2]}<extra></extra>"),
+                    ))
+                    fig_t.update_layout(
+                        height=300, margin=dict(t=30, b=30, l=40, r=20),
+                        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                        yaxis=dict(range=[0, 105], gridcolor="rgba(148,163,184,0.15)",
+                                   tickfont=dict(color="#94A3B8"), title=dict(text="Health", font=dict(color="#94A3B8"))),
+                        xaxis=dict(tickfont=dict(color="#94A3B8")),
+                        hoverlabel=dict(bgcolor="#141B2D", font=dict(color="#E2E8F0")),
+                    )
+                    st.plotly_chart(fig_t, use_container_width=True)
+
+                    rows = []
+                    for i, h in enumerate(history):
+                        change = "—" if i == 0 else f"{h['overall'] - history[i - 1]['overall']:+d}"
+                        rows.append({
+                            "Run": h["run"], "Time": h["timestamp"], "Trigger": h["label"],
+                            "Health": h["overall"], "Change": change,
+                            "Scope": h["scope_clarity"], "Timeline": h["timeline_risk"],
+                            "Blocker load": h["blocker_load"],
+                            "Risks": h["risks"], "Blockers": h["blockers"],
+                        })
+                    st.dataframe(rows, use_container_width=True, hide_index=True)
         else:
             st.info("Health score not available.")
 
@@ -388,8 +462,12 @@ if st.session_state.analysis_done:
                 <div class="row-{cls}" style="margin:12px 0;">
                     <span class="tag tag-{cls}">{(r.get('severity') or '').upper()}</span>
                     <strong style="color:#F1F5F9; margin-left:10px;">{r.get('description')}</strong><br>
-                    <span style="color:#94A3B8; font-size:0.85rem;">Impact: {r.get('likely_impact')} · Source: {r.get('evidence_source')}</span>
+                    <span style="color:#94A3B8; font-size:0.85rem;">{risk_meta_line(r)}</span>
                 </div>""", unsafe_allow_html=True)
+
+    # ---------------- RISK MATRIX: probability vs impact ----------------
+    with tab_matrix:
+        render_risk_matrix_tab(risks)
 
     with tab_blockers:
         if blockers:
@@ -552,7 +630,8 @@ if st.session_state.analysis_done:
                 else:
                     status.write("ℹ️ No new content to index.")
 
-                run_agents_pipeline(status)
+                trigger = ("Added: " + ", ".join(to_process)) if to_process else "Refresh (no new files)"
+                run_agents_pipeline(status, trigger[:90])
                 status.update(label="Knowledge base and insights updated!", state="complete", expanded=False)
 
             if "assistant" in st.session_state:
