@@ -1,130 +1,334 @@
+
 # Project Intelligence & Risk Advisor
 
-An AI-driven platform that ingests enterprise project documents — proposals, reports, task lists, meeting notes — and uses a Retrieval-Augmented Generation (RAG) pipeline with specialized AI agents to automatically surface project risks, scope gaps, and health insights, presented through an interactive dashboard.
+### AI-Powered Enterprise Project Analysis, Risk Detection & Decision Support
 
-Built as part of an Infosys Springboard internship project on AI-driven enterprise project intelligence.
+An AI-driven project intelligence platform that transforms unstructured enterprise project documents into actionable insights using Retrieval-Augmented Generation (RAG), specialized AI agents, and explainable project health scoring.
+
+The platform identifies project risks, scope gaps, blockers, and action items through an interactive Streamlit dashboard.
+
+---
+
+## Overview
+
+Project teams work with multiple documents, including project proposals, status reports, meeting notes, requirements, and defect trackers. Manually reviewing these documents makes it difficult to identify risks, track blockers, and maintain a consolidated view of project health.
+
+**Project Intelligence & Risk Advisor** automates project document analysis and transforms unstructured information into structured, actionable project intelligence.
 
 ## Features
 
-- **Multi-format document ingestion** — parses PDF, DOCX, CSV, and TXT project documents into a unified text representation, restricted to these supported types at upload
-- **Semantic + hybrid search** — documents are chunked, embedded, and indexed in a vector database; retrieval combines semantic similarity with exact metadata filtering and multi-query merging
-- **Fully automatic end-to-end analysis** — one click runs ingestion, all extraction agents, documentation generation, and health scoring with no further manual steps
-- **Multi-agent extraction pipeline** — specialized agents extract scope, risks, and blockers/action items, each reasoning over retrieved content via LLMs
-- **Resilient, multi-provider LLM backend** — Google Gemini, Groq, and Cloudflare Workers AI in a rotating fallback chain per agent, with in-loop JSON validation so a malformed response triggers fallback instead of being accepted
-- **Automatic documentation generation** — Agile user stories, a risk register with mitigation suggestions, and a consolidated action item list, generated automatically and downloadable as a Word document
-- **Deterministic, explainable health scoring** — an auditable formula across scope clarity, timeline risk, and blocker load, not an opaque AI-generated number
-- **Conversational assistant** — hybrid-grounded Q&A combining a persisted project summary with live document retrieval, presented as a floating chat popup
-- **Incremental document updates** — add new documents at any time; only new or changed files are re-embedded, while extraction agents fully re-run so conclusions always reflect the complete, current picture
-- **Polished interactive dashboard** — built with Streamlit, featuring a health gauge, severity-coded risk/blocker views, and an "at a glance" summary strip
+### 1. Multi-Format Document Ingestion
+- Supports PDF, DOCX, CSV, and TXT documents.
+- Extracts and normalizes document content.
+- Prepares documents for semantic retrieval and AI analysis.
 
-## Tech Stack
+### 2. Retrieval-Augmented Generation (RAG)
+- Text chunking with overlapping segments.
+- Semantic embeddings using Sentence Transformers.
+- Vector storage and retrieval using ChromaDB.
+- Context-grounded responses based on project documents.
 
-| Layer | Technology |
+### 3. Multi-Agent Project Analysis
+Specialized AI agents analyze:
+- **Scope:** Requirements, deliverables, and potential gaps.
+- **Risks:** Potential risks, severity, and mitigation strategies.
+- **Blockers:** Project impediments and follow-up actions.
+- **Documentation:** Structured project-management outputs.
+
+### 4. Multi-Provider LLM Support
+- Google Gemini
+- Groq
+- Cloudflare Workers AI
+
+Supports provider fallback and structured JSON output validation, according to the configured implementation.
+
+### 5. Automated Documentation
+Generate project-management artifacts such as:
+- Agile user stories
+- Project risk registers
+- Action-item lists
+
+Export supported reports as Microsoft Word documents.
+
+### 6. Project Health Score
+Calculates a project health score using defined indicators such as:
+- Scope clarity
+- Timeline risk
+- Blocker load
+
+The deterministic scoring approach makes the calculation more transparent and explainable.
+
+### 7. Conversational Project Assistant
+Ask questions about project documents and receive context-aware answers using document retrieval and project context.
+
+### 8. Incremental Document Updates
+- Add new project documents.
+- Track new or changed files.
+- Reprocess updated documents.
+- Refresh project insights when source information changes.
+
+### 9. Interactive Dashboard
+- Project health visualization
+- Scope analysis
+- Risk and blocker views
+- Consolidated project summary
+- Documentation export
+- Conversational assistant
+
+---
+
+## Technology Stack
+
+| Component | Technology |
 |---|---|
-| Language | Python |
-| Document parsing | pypdf, python-docx, pandas |
-| Chunking | LangChain text splitters |
-| Embeddings | Sentence-Transformers (`all-MiniLM-L6-v2`) |
-| Vector store | ChromaDB |
-| LLM reasoning | Google Gemini, Groq, Cloudflare Workers AI (via OpenAI-compatible client) |
-| Document export | python-docx |
-| UI | Streamlit, Plotly |
+| Programming Language | Python |
+| Frontend | Streamlit |
+| Visualization | Plotly |
+| PDF Processing | pypdf |
+| Word Documents | python-docx |
+| Data Processing | pandas |
+| Text Chunking | LangChain text splitters |
+| Embeddings | Sentence Transformers |
+| Embedding Model | all-MiniLM-L6-v2 |
+| Vector Database | ChromaDB |
+| LLM Providers | Gemini, Groq, Cloudflare Workers AI |
+| Structured Data | JSON |
 
-## Architecture
+---
 
-```
-Raw documents (PDF/DOCX/CSV/TXT)
-        │
-        ▼
-  Ingestion layer  ──▶  normalizes every format into plain text + metadata
-        │
-        ▼
-    Chunking      ──▶  splits text into overlapping, semantically coherent passages
-        │
-        ▼
-   Embedding       ──▶  converts each chunk into a dense vector representation
-        │
-        ▼
-  Vector store     ──▶  indexed for fast semantic + hybrid similarity search
-        │
-        ▼
-  Agent retrieval   ──▶  each agent pulls the context relevant to its question,
-                          always including the latest document batch
-        │
-        ▼
-  LLM reasoning      ──▶  multi-provider fallback chain (Gemini → Groq → Cloudflare)
-        │
-        ▼
-  Structured JSON ──▶  Documentation generation ──▶ Health scoring
-        │
-        ▼
-  Interactive dashboard + conversational assistant
+## System Architecture
+
+```text
+Project Documents
+ PDF / DOCX / CSV / TXT
+          |
+          v
+  Document Ingestion
+          |
+          v
+    Text Chunking
+          |
+          v
+ Embedding Generation
+          |
+          v
+     ChromaDB
+          |
+          v
+  Context Retrieval
+          |
+          v
+ Specialized AI Agents
+    /      |       \
+   v       v        v
+ Scope    Risk   Blockers and
+Analysis Analysis Action Items
+    \      |       /
+          v
+   Structured Outputs
+          |
+     +----+----+
+     |         |
+     v         v
+ Documentation Health Score
+  Generation  Calculation
+     |         |
+     +----+----+
+          |
+          v
+  Streamlit Dashboard
+          |
+    +-----+------+
+    |     |      |
+    v     v      v
+ Insights Export  Chat
 ```
 
 ## Project Structure
 
-```
+```text
 project-intelligence-and-risk-advisor/
+│
 ├── .streamlit/
-│   └── config.toml         # native Streamlit theming
-├── data/raw/                # source project documents
-├── output/
-│   ├── insights/            # saved agent outputs (scope, risks, blockers, health, docs)
-│   ├── ingestion_manifest.json  # tracks which files are already indexed
-│   └── last_batch.json      # tracks the most recent ingestion batch
+│   └── config.toml
+│
 ├── src/
-│   ├── schemas.py            # core data models (Document, Chunk)
-│   ├── ingestion/            # per-format document loaders + incremental manifest
-│   ├── rag/                  # chunking, embeddings, vector store
-│   ├── llm/                  # multi-provider LLM client with fallback
-│   ├── agents/                # scope, risk, blocker, and documentation agents
-│   ├── chat_agent.py          # conversational assistant
-│   ├── health_score.py        # deterministic health scoring
-│   ├── doc_export.py          # Word document generation
-│   ├── main.py                 # ingestion pipeline entry point (CLI)
-│   └── run_agents.py           # runs all agents against indexed data (CLI)
-├── app.py                     # Streamlit dashboard entry point
+│   ├── schemas.py
+│   ├── ingestion/
+│   ├── rag/
+│   ├── llm/
+│   ├── agents/
+│   ├── chat_agent.py
+│   ├── health_score.py
+│   ├── doc_export.py
+│   ├── main.py
+│   └── run_agents.py
+│
+├── output/
+│   └── insights/
+│
+├── app.py
 ├── requirements.txt
 ├── LICENSE
 └── README.md
 ```
 
-## Setup
+## Installation and Setup
+
+### Prerequisites
+- Python
+- Git
+- Internet connection
+- API credentials for at least one supported LLM provider
+
+### 1. Clone the Repository
 
 ```bash
+git clone https://github.com/Srinivas25046/project-intelligence-and-risk-advisor.git
+cd project-intelligence-and-risk-advisor
+```
+
+### 2. Create a Virtual Environment
+
+**Windows:**
+
+```powershell
 python -m venv venv
-venv\Scripts\Activate.ps1      # Windows
+.\venv\Scripts\Activate.ps1
+```
+
+**Linux / macOS:**
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in the project root with your free-tier API keys:
+### 4. Configure API Credentials
 
+Create a `.env` file in the repository root and add the credentials required by your configured providers.
+
+```dotenv
+GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 ```
-GEMINI_API_KEY=your_key_here
-GROQ_API_KEY=your_key_here
-CLOUDFLARE_API_TOKEN=your_token_here
-CLOUDFLARE_ACCOUNT_ID=your_account_id_here
-```
 
-## Usage
+Replace the placeholders with your actual credentials. Use only the providers enabled by your application.
 
-**Interactive dashboard (recommended):**
+**Security:** Never commit API keys or other secrets to GitHub. Ensure `.env` is excluded from version control.
+
+### 5. Run the Application
 
 ```bash
 streamlit run app.py
 ```
 
-Upload PDF/DOCX/CSV/TXT files, click **Run Full Analysis**, and explore the Health, Scope, Risks, Blockers, and Documentation tabs. Add further documents at any time via **Add More Documents** to incrementally update the knowledge base and refresh all insights. Use the floating chat icon to ask questions about the project.
+Open the local URL displayed in the terminal.
 
-**Command-line pipeline (for development/testing):**
+---
+
+## How to Use
+
+1. Launch the Streamlit application.
+2. Upload project documents.
+3. Run the project analysis workflow.
+4. Review the project health score.
+5. Explore scope insights, risks, and blockers.
+6. Review generated user stories, risk registers, and action items.
+7. Export supported documentation.
+8. Ask project-specific questions through the conversational assistant.
+9. Upload updated documents and refresh the analysis when necessary.
+
+---
+
+## Command-Line Execution
+
+The repository includes command-line entry points for individual components.
 
 ```bash
-python -m src.main          # ingest documents and build the vector index
-python -m src.run_agents    # run all extraction agents and save insights
-python -m src.health_score  # compute the deterministic health score
-python -m src.chat_agent    # interactive terminal chat session
+# Document ingestion
+python -m src.main
+
+# Run analysis agents
+python -m src.run_agents
+
+# Calculate project health
+python -m src.health_score
+
+# Start the conversational assistant
+python -m src.chat_agent
 ```
+
+Run these commands according to the requirements of each module.
+
+---
+
+## Use Cases
+
+- Software development and Agile project management
+- Enterprise project planning
+- Scope and requirement analysis
+- Risk identification and mitigation
+- Defect and blocker tracking
+- Project status reporting
+- Meeting-note and action-item consolidation
+
+---
+
+## Design Principles
+
+- **Context-grounded analysis:** Use retrieved project evidence to support AI-generated insights.
+- **Modular architecture:** Separate ingestion, retrieval, LLM integration, agents, scoring, and presentation.
+- **Provider resilience:** Support multiple LLM services.
+- **Explainable scoring:** Use explicit logic for project health calculations.
+- **Incremental processing:** Avoid unnecessary reprocessing of unchanged documents.
+- **Actionable outputs:** Convert unstructured information into structured project-management artifacts.
+
+---
+
+## Limitations
+
+- AI-generated findings may contain errors and require human review.
+- Analysis quality depends on the completeness and accuracy of source documents.
+- LLM services may be affected by API quotas, connectivity, or provider availability.
+- Semantic retrieval may miss relevant information.
+- The health score depends on the implemented formula and input indicators.
+- The application supports project-management decisions but does not replace professional judgment.
+
+## Future Enhancements
+
+- Jira and project-management platform integrations
+- Project timeline and dependency visualization
+- Historical risk and health-score tracking
+- Role-based access control
+- Automated report scheduling
+- Agent evaluation and accuracy benchmarks
+- Additional document formats and enterprise knowledge sources
+
+These are potential enhancements, not claims about existing functionality.
+
+---
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+See the [`LICENSE`](LICENSE) file for licensing details.
+
+## Author
+
+**Srinivas Gorantla**
+
+- GitHub: [@Srinivas25046](https://github.com/Srinivas25046)
+- Repository: [Project Intelligence & Risk Advisor](https://github.com/Srinivas25046/project-intelligence-and-risk-advisor)
+
+---
+
+*An AI-powered project intelligence platform demonstrating RAG, multi-agent workflows, document intelligence, and explainable project analytics.*
